@@ -125,4 +125,7 @@ For feedback, contact Mechiel Lukkien at mechiel@ueber.net.
 
 ## Todo
 
+- progress bar doesn't work as expected. we show bytes transfered of total bytes in file. but we quit easier for partial restores. should indicate we aren't going to download the full block.
+- should check created (remote) file exists just after uploading.
 - is our behaviour desirable when restoring to a directory that already has some files?  we currently fail when we try to create a file/directory that already exists.
+- look into using google sdk for cloud storage.
