@@ -22,5 +22,5 @@ func help(args []string) {
 	flag.Usage() // usage from main command
 	printExampleConfig()
 	log.Println("")
-	log.Println("See https://github.com/irias/bolong for details.")
+	log.Println("See https://github.com/mjl-/bolong for details.")
 }

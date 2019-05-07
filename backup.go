@@ -134,7 +134,7 @@ func backupCmd(args []string, name string) {
 						done <- struct{}{}
 					}(path)
 				}
-				for _ = range paths {
+				for range paths {
 					<-done
 				}
 				os.Exit(1)

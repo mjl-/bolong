@@ -2,7 +2,7 @@
 /.bolong.json
 /local/
 /testdir/
-
-.hg/
+/cover.out
+/cover.html
 
 *.swp

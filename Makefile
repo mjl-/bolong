@@ -1,14 +1,11 @@
 build:
-	go build -i
+	go build
+	go vet
 
 test:
-	go test -cover
-	go vet
+	go test -coverprofile=cover.out
+	go tool cover -html=cover.out -o cover.html
 	golint
-
-cover:
-	go test -coverprofile=coverage.out
-	go tool cover -html=coverage.out
 
 release:
 	env GOOS=linux GOARCH=amd64 ./release.sh
@@ -18,7 +15,7 @@ release:
 	env GOOS=windows GOARCH=amd64 ./release.sh
 
 fmt:
-	gofmt -w *.go
+	go fmt
 
 clean:
 	go clean
