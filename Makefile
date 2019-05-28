@@ -1,3 +1,7 @@
+export GOFLAGS=-mod=vendor
+export GOPROXY=off
+export CGO_ENABLED=0
+
 build:
 	go build
 	go vet
