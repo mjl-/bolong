@@ -50,7 +50,7 @@ Start with this annotated example JSON config file when creating your own config
 		/*
 		Similar to "include", but if a path matches one of these regular
 		expressions, it will not be included in the backup (even if the
-		path matches on of the "include"s).
+		path matches one of the "include"s).
 		*/
 		"exclude": [
 			"^tmp/",
