@@ -208,6 +208,13 @@ func backupCmd(args []string, name string) {
 			}
 		}
 
+		if info.Mode() & (os.ModeDevice|os.ModeNamedPipe|os.ModeSocket|os.ModeCharDevice) != 0 {
+			if *verbose {
+				log.Printf(`skipping special file %s with mode %s`, matchPath, info.Mode())
+			}
+			return nil
+		}
+
 		size := int64(0)
 		if !info.IsDir() {
 			size = info.Size()
