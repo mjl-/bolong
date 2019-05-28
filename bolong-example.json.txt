@@ -55,7 +55,7 @@ Start with this annotated example JSON config file when creating your own config
 		"exclude": [
 			"^tmp/",
 			"^.git/",
-			"/.git/",
+			"/.git/"
 		],
 
 		/*

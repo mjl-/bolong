@@ -169,7 +169,7 @@ example config file:
 	"exclude": [
 		"^tmp/",
 		"^.git/",
-		"/.git/",
+		"/.git/"
 	],
 	"incrementalsPerFull": 2,
 	"fullKeep": 5,
