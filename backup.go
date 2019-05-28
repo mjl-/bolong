@@ -277,7 +277,7 @@ func backupCmd(args []string, name string) {
 		} else {
 			err := storeFile(path, nf.size, data)
 			if err != nil {
-				log.Fatalf("writing %s: %s", path, err)
+				log.Fatalf("storing %s: %s", path, err)
 			}
 		}
 		dataOffset += nf.size
