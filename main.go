@@ -162,6 +162,18 @@ example config file:
 		"bucket": "your-bucket-name",
 		"path": "/projectname/"
 	},
+	"include": [
+		"^testdata/$",
+		"\\.go$"
+	],
+	"exclude": [
+		"^tmp/",
+		"^.git/",
+		"/.git/",
+	],
+	"incrementalsPerFull": 2,
+	"fullKeep": 5,
+	"incrementalForFullKeep": 3,
 	"passphrase": "your secret passphrase"
 }
 `)
