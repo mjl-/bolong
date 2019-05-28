@@ -44,7 +44,7 @@ func check(err error, msg string) {
 	if msg == "" {
 		log.Fatal(err)
 	}
-	log.Fatalf("%s: %s\n", msg, err)
+	log.Fatalf("%s: %s", msg, err)
 }
 
 func main() {

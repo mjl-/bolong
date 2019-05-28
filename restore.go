@@ -47,7 +47,7 @@ func restoreCmd(args []string) {
 	for _, pattern := range args[1:] {
 		re, err := regexp.Compile(pattern)
 		if err != nil {
-			log.Fatalf("compiling regexp %s: %s\n", pattern, err)
+			log.Fatalf("compiling regexp %s: %s", pattern, err)
 		}
 		regexps = append(regexps, re)
 	}
@@ -58,10 +58,10 @@ func restoreCmd(args []string) {
 	euid := os.Geteuid()
 	egid := os.Getegid()
 	if !*quiet && euid != 0 {
-		log.Printf("warning: not running as root, so not restoring user/group file ownership\n")
+		log.Printf("warning: not running as root, so not restoring user/group file ownership")
 	}
 	if !*quiet {
-		log.Printf("restoring %s to %s\n", backup.name, target)
+		log.Printf("restoring %s to %s", backup.name, target)
 	}
 
 	idx, err := readIndex(backup)
@@ -126,7 +126,7 @@ func restoreCmd(args []string) {
 		if len(restores) == 1 {
 			partWord = "part"
 		}
-		log.Printf("restoring %d %s and %d %s totalling %s which requires fetching %s for %d backup %s\n", len(dirs), dirWord, nfiles, fileWord, formatSize(totalSize), formatSize(dataSize), len(restores), partWord)
+		log.Printf("restoring %d %s and %d %s totalling %s which requires fetching %s for %d backup %s", len(dirs), dirWord, nfiles, fileWord, formatSize(totalSize), formatSize(dataSize), len(restores), partWord)
 	}
 
 	err = os.MkdirAll(target, 0777)
@@ -155,7 +155,7 @@ func restoreCmd(args []string) {
 		if err == nil {
 			id, err := strconv.ParseInt(u.Uid, 10, 64)
 			if err != nil {
-				log.Printf("uid %q (%q) not an int, not restoring that file owner\n", u.Uid, name)
+				log.Printf("uid %q (%q) not an int, not restoring that file owner", u.Uid, name)
 				return -1
 			}
 			return int(id)
@@ -168,7 +168,7 @@ func restoreCmd(args []string) {
 		if err == nil {
 			return int(id)
 		}
-		log.Printf("unknown user %q, not restoring that file owner\n", name)
+		log.Printf("unknown user %q, not restoring that file owner", name)
 		return -1
 	}
 	lookupGroup := func(name string) int {
@@ -181,7 +181,7 @@ func restoreCmd(args []string) {
 		if err == nil {
 			id, err := strconv.ParseInt(g.Gid, 10, 64)
 			if err != nil {
-				log.Printf("gid %q (%q) not an int, not restoring that file group\n", g.Gid, name)
+				log.Printf("gid %q (%q) not an int, not restoring that file group", g.Gid, name)
 				return -1
 			}
 			return int(id)
@@ -194,7 +194,7 @@ func restoreCmd(args []string) {
 		if err == nil {
 			return int(id)
 		}
-		log.Printf("unknown group %q, not restoring that file group\n", name)
+		log.Printf("unknown group %q, not restoring that file group", name)
 		return -1
 	}
 	lchown := func(f *file, tpath string) (err error) {

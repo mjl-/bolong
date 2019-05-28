@@ -157,10 +157,10 @@ func backupCmd(args []string, name string) {
 	nfiles := 0
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			log.Fatalf("error walking %s: %s\n", path, err)
+			log.Fatalf("error walking %s: %s", path, err)
 		}
 		if !strings.HasPrefix(path, dir) {
-			log.Printf("path not prefixed by dir? path %s, dir %s\n", path, dir)
+			log.Printf("path not prefixed by dir? path %s, dir %s", path, dir)
 			return nil
 		}
 		relpath := path[len(dir):]
@@ -277,7 +277,7 @@ func backupCmd(args []string, name string) {
 		} else {
 			err := storeFile(path, nf.size, data)
 			if err != nil {
-				log.Fatalf("writing %s: %s\n", path, err)
+				log.Fatalf("writing %s: %s", path, err)
 			}
 		}
 		dataOffset += nf.size
@@ -338,12 +338,12 @@ func backupCmd(args []string, name string) {
 	partialpaths <- "" // signal that we're done
 
 	if *verbose {
-		log.Printf("new %s backup: %s\n", kindName, name)
+		log.Printf("new %s backup: %s", kindName, name)
 		addDel := ""
 		if incremental {
 			addDel = fmt.Sprintf(", +%d files, -%d files", len(nidx.add), len(nidx.delete))
 		}
-		log.Printf("total files %d, total size %s, backup size %s%s\n", nfiles, formatSize(dataOffset), formatSize(dwc.size+iwc.size), addDel)
+		log.Printf("total files %d, total size %s, backup size %s%s", nfiles, formatSize(dataOffset), formatSize(dwc.size+iwc.size), addDel)
 	}
 
 	if config.FullKeep > 0 || config.IncrementalForFullKeep > 0 {
@@ -369,7 +369,7 @@ func backupCmd(args []string, name string) {
 					kind = "incremental"
 				}
 				if *verbose {
-					log.Printf("cleaning up old %s backup %s\n", kind, backups[j].name)
+					log.Printf("cleaning up old %s backup %s", kind, backups[j].name)
 				}
 				err = store.Delete(backups[j].name + ".data")
 				if err != nil {
