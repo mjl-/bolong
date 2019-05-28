@@ -178,7 +178,6 @@ func readIndex(b *backup) (idx *index, err error) {
 			err = fmt.Errorf("closing index file: %s", err)
 			idx = nil
 		}
-		return
 	}()
 
 	idx = &index{}

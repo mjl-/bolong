@@ -18,7 +18,7 @@ func (l *local) List() (names []string, err error) {
 	if err != nil {
 		return nil, err
 	}
-	names = make([]string, len(files), len(files))
+	names = make([]string, len(files))
 	for i, info := range files {
 		names[i] = info.Name()
 	}
