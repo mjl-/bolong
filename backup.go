@@ -153,33 +153,14 @@ func backupCmd(args []string, name string) {
 	check(err, "creating safe file")
 
 	var whitelist []string // whitelisted directories. all children files will be included.
-	dataOffset := int64(0)
-	nfiles := 0
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Fatalf("error walking %s: %s", path, err)
-		}
-		if !strings.HasPrefix(path, dir) {
-			log.Printf("path not prefixed by dir? path %s, dir %s", path, dir)
-			return nil
-		}
-		relpath := path[len(dir):]
-		matchPath := relpath
-		if relpath == "" {
-			relpath = "."
-		}
-		if relpath == ".bolong.conf" || strings.HasSuffix(relpath, "/.bolong.conf") {
-			return nil
-		}
-		if info.IsDir() && matchPath != "" {
-			matchPath += "/"
-		}
+
+	skip := func(matchPath string, matchInfo os.FileInfo, verbose bool) bool {
 		if len(includes) > 0 {
 			match := matchAny(includes, matchPath)
-			if match && info.IsDir() {
+			if match && matchInfo.IsDir() {
 				whitelist = append(whitelist, matchPath)
 			}
-			if !match && !info.IsDir() {
+			if !match && !matchInfo.IsDir() {
 				keep := false
 				for _, white := range whitelist {
 					if strings.HasPrefix(matchPath, white) {
@@ -188,58 +169,94 @@ func backupCmd(args []string, name string) {
 					}
 				}
 				if !keep {
-					if *verbose {
+					if verbose {
 						log.Println(`no "include" match, skipping`, matchPath)
 					}
-					return nil
+					return true
 				}
 			}
 		}
 		if len(excludes) > 0 {
 			match := matchAny(excludes, matchPath)
 			if match {
-				if *verbose {
+				if verbose {
 					log.Println(`"exclude" match, skipping`, matchPath)
 				}
-				if info.IsDir() {
-					return filepath.SkipDir
-				}
-				return nil
+				return true
 			}
 		}
+		return false
+	}
 
-		if info.Mode()&(os.ModeDevice|os.ModeNamedPipe|os.ModeSocket|os.ModeCharDevice) != 0 {
+	dataOffset := int64(0)
+	nfiles := 0
+	filepath.Walk(dir, func(path string, walkInfo os.FileInfo, err error) error {
+		if !strings.HasPrefix(path, dir) {
+			log.Printf("path not prefixed by dir? path %s, dir %s", path, dir)
+			return nil
+		}
+
+		relPath := path[len(dir):]
+		matchPath := relPath
+		if relPath == "" {
+			relPath = "."
+		}
+		if walkInfo != nil && walkInfo.IsDir() && matchPath != "" {
+			matchPath += "/"
+		}
+
+		if err != nil {
+			// We might get a permission denied for a directory that we want to skip. So even
+			// with error, check if the path was meant to be skipped.
+			if walkInfo != nil && skip(matchPath, walkInfo, false) {
+				return nil
+			}
+			log.Fatalf("error walking %s: %s", path, err)
+		}
+
+		if relPath == ".bolong.conf" || strings.HasSuffix(relPath, "/.bolong.conf") {
+			return nil
+		}
+
+		if skip(matchPath, walkInfo, *verbose) {
+			if walkInfo.IsDir() {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		if walkInfo.Mode()&(os.ModeDevice|os.ModeNamedPipe|os.ModeSocket|os.ModeCharDevice) != 0 {
 			if *verbose {
-				log.Printf(`skipping special file %s with mode %s`, matchPath, info.Mode())
+				log.Printf(`skipping special file %s with mode %s`, matchPath, walkInfo.Mode())
 			}
 			return nil
 		}
 
 		size := int64(0)
-		if !info.IsDir() {
-			size = info.Size()
+		if !walkInfo.IsDir() {
+			size = walkInfo.Size()
 		}
-		owner, group := userGroupName(info)
+		owner, group := userGroupName(walkInfo)
 		nf := &file{
-			info.IsDir(),
-			info.Mode()&os.ModeSymlink != 0,
-			info.Mode() & os.ModePerm,
-			info.ModTime(),
+			walkInfo.IsDir(),
+			walkInfo.Mode()&os.ModeSymlink != 0,
+			walkInfo.Mode() & os.ModePerm,
+			walkInfo.ModTime(),
 			size,
 			owner,
 			group,
 			-1, // data offset
 			-1, // previous index, possibly updated later
-			relpath,
+			relPath,
 		}
 
 		nidx.contents = append(nidx.contents, nf)
 		nfiles++
 
 		if incremental {
-			of, ok := unseen[relpath]
+			of, ok := unseen[relPath]
 			if ok {
-				delete(unseen, relpath)
+				delete(unseen, relPath)
 				if !fileChanged(of, nf) {
 					if !nf.isDir {
 						nf.dataOffset = of.dataOffset
@@ -256,14 +273,14 @@ func backupCmd(args []string, name string) {
 					return nil
 				}
 			} else {
-				nidx.add = append(nidx.add, relpath)
+				nidx.add = append(nidx.add, relPath)
 				if *verbose {
-					fmt.Println(relpath)
+					fmt.Println(relPath)
 				}
 			}
 		} else {
 			if *verbose {
-				fmt.Println(relpath)
+				fmt.Println(relPath)
 			}
 		}
 
