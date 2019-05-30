@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -9,6 +8,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/mjl-/sconf"
 )
 
 type testFile struct {
@@ -32,7 +33,7 @@ func TestMain(t *testing.T) {
 	test := func(err error, msg string) {
 		t.Helper()
 		if err != nil {
-			t.Errorf("%s: %s", msg, err)
+			t.Fatalf("%s: %s", msg, err)
 		}
 	}
 
@@ -50,7 +51,9 @@ func TestMain(t *testing.T) {
 
 	writeConfig := func() {
 		c := configuration{
-			Kind: "local",
+			Local: &struct {
+				Path string `sconf-doc:"Path on local file system to store backups at."`
+			}{"testdir/backup"},
 			Include: []string{
 				"\\.txt$",
 				"^a/b/$",
@@ -63,13 +66,12 @@ func TestMain(t *testing.T) {
 			IncrementalForFullKeep: 1,
 			Passphrase:             "test1234",
 		}
-		c.Local.Path = "testdir/backup"
-		f, err := os.Create("testdir/workdir/.bolong.json")
-		test(err, "creating .bolong.json")
-		err = json.NewEncoder(f).Encode(&c)
-		test(err, "writing .bolong.json")
+		f, err := os.Create("testdir/workdir/.bolong.conf")
+		test(err, "creating .bolong")
+		err = sconf.Write(f, &c)
+		test(err, "writing .bolong.conf")
 		err = f.Close()
-		test(err, "closing .bolong.json")
+		test(err, "closing .bolong.conf")
 	}
 
 	ensureTree := func(tree testTree) {
@@ -169,7 +171,7 @@ func TestMain(t *testing.T) {
 			if relpath == "" {
 				relpath = "."
 			}
-			if relpath == ".bolong.json" || strings.HasSuffix(relpath, "/.bolong.json") {
+			if relpath == ".bolong.conf" || strings.HasSuffix(relpath, "/.bolong.conf") {
 				return nil
 			}
 			if info.IsDir() {
@@ -203,7 +205,7 @@ func TestMain(t *testing.T) {
 
 	writeConfig()
 
-	*configPath = "testdir/workdir/.bolong.json"
+	*configPath = "testdir/workdir/.bolong.conf"
 	parseConfig()
 
 	// start with simple test

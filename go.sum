@@ -1,5 +1,9 @@
 github.com/minio/sio v0.0.0-20170919020100-ac72eebc12cd h1:rzP8umwDgPDUFIjlAK0qj71IHsSvLfZMLYMXATwMMRs=
 github.com/minio/sio v0.0.0-20170919020100-ac72eebc12cd/go.mod h1:PDJGYr8GXjiOTIst0hQMOSK5FdXLwObr2cGbiMddDPc=
+github.com/mjl-/sconf v0.0.0-20190530080544-a83d7850991f h1:eQmwDLxuL4PL11i70Y5l1lUIYXWodsDnnjaKNT5OWLc=
+github.com/mjl-/sconf v0.0.0-20190530080544-a83d7850991f/go.mod h1:ezf7YOn7gtClo8y71SqgZKaEkyMQ5Te7vkv4PmTTfwM=
+github.com/mjl-/xfmt v0.0.0-20190521151243-39d9c00752ce h1:oyFmIHo3GLWZzb0odAzN9QUy0MTW6P8JaNRnNVGCBCk=
+github.com/mjl-/xfmt v0.0.0-20190521151243-39d9c00752ce/go.mod h1:DIEOLmETMQHHr4OgwPG7iC37rDiN9MaZIZxNm5hBtL8=
 github.com/pierrec/lz4 v2.0.5+incompatible h1:2xWsjqPFWcplujydGg4WmhC/6fZqK42wMM8aXeqhl0I=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=

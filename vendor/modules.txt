@@ -1,5 +1,9 @@
 # github.com/minio/sio v0.0.0-20170919020100-ac72eebc12cd
 github.com/minio/sio
+# github.com/mjl-/sconf v0.0.0-20190530080544-a83d7850991f
+github.com/mjl-/sconf
+# github.com/mjl-/xfmt v0.0.0-20190521151243-39d9c00752ce
+github.com/mjl-/xfmt
 # github.com/pierrec/lz4 v2.0.5+incompatible
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32

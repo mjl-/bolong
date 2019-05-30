@@ -168,7 +168,7 @@ func backupCmd(args []string, name string) {
 		if relpath == "" {
 			relpath = "."
 		}
-		if relpath == ".bolong.json" || strings.HasSuffix(relpath, "/.bolong.json") {
+		if relpath == ".bolong.conf" || strings.HasSuffix(relpath, "/.bolong.conf") {
 			return nil
 		}
 		if info.IsDir() && matchPath != "" {
@@ -208,7 +208,7 @@ func backupCmd(args []string, name string) {
 			}
 		}
 
-		if info.Mode() & (os.ModeDevice|os.ModeNamedPipe|os.ModeSocket|os.ModeCharDevice) != 0 {
+		if info.Mode()&(os.ModeDevice|os.ModeNamedPipe|os.ModeSocket|os.ModeCharDevice) != 0 {
 			if *verbose {
 				log.Printf(`skipping special file %s with mode %s`, matchPath, info.Mode())
 			}
