@@ -157,8 +157,10 @@ func backupCmd(args []string, name string) {
 	partialpaths <- dataPath
 	dwc := &writeCounter{f: data}
 	data = dwc
-	data, err = newSafeWriter(data)
-	check(err, "creating safe file")
+	if !*dryrun {
+		data, err = newSafeWriter(data)
+		check(err, "creating safe file")
+	}
 
 	var whitelist []string // whitelisted directories. all children files will be included.
 
@@ -196,6 +198,7 @@ func backupCmd(args []string, name string) {
 		return false
 	}
 
+	failed := false
 	dataOffset := int64(0)
 	nfiles := 0
 	filepath.Walk(dir, func(path string, walkInfo os.FileInfo, err error) error {
@@ -219,7 +222,12 @@ func backupCmd(args []string, name string) {
 			if walkInfo != nil && skip(matchPath, walkInfo, false) {
 				return nil
 			}
-			log.Fatalf("error walking %s: %s", path, err)
+			if os.IsNotExist(err) || os.IsPermission(err) {
+				log.Printf("error walking %s: %s, continuing with error", path, err)
+				failed = true
+			} else {
+				log.Fatalf("error walking %s: %s", path, err)
+			}
 		}
 
 		if relPath == ".bolong.conf" || strings.HasSuffix(relPath, "/.bolong.conf") {
@@ -296,6 +304,7 @@ func backupCmd(args []string, name string) {
 			return nil
 		}
 		nf.dataOffset = dataOffset
+		var written int64
 		if nf.isSymlink {
 			p, err := os.Readlink(path)
 			check(err, "readlink")
@@ -305,14 +314,21 @@ func backupCmd(args []string, name string) {
 			if n != len(buf) {
 				panic("did not write full buf")
 			}
-			nf.size = int64(n)
+			written = int64(n)
 		} else {
-			err := storeFile(path, nf.size, data)
+			n, fatal, err := storeFile(path, nf.size, data)
 			if err != nil {
-				log.Fatalf("storing %s: %s", path, err)
+				if !fatal {
+					log.Printf("storing %s: %s, continuing with error", path, err)
+					failed = true
+				} else {
+					log.Fatalf("storing %s: %s", path, err)
+				}
+			} else {
+				written = n
 			}
 		}
-		dataOffset += nf.size
+		dataOffset += written
 
 		return nil
 	})
@@ -357,10 +373,12 @@ func backupCmd(args []string, name string) {
 	index, err = store.Create(indexPath + ".tmp")
 	check(err, "creating index file")
 	partialpaths <- indexPath + ".tmp"
-	index, err = newSafeWriter(index)
+	if !*dryrun {
+		index, err = newSafeWriter(index)
+		check(err, "creating safe file")
+	}
 	iwc := &writeCounter{f: index}
 	index = iwc
-	check(err, "creating safe file")
 	err = writeIndex(index, nidx)
 	check(err, "writing index file")
 	err = index.Close()
@@ -376,6 +394,14 @@ func backupCmd(args []string, name string) {
 			addDel = fmt.Sprintf(", +%d files, -%d files", len(nidx.add), len(nidx.delete))
 		}
 		log.Printf("total files %d, total size %s, backup size %s%s", nfiles, formatSize(dataOffset), formatSize(dwc.size+iwc.size), addDel)
+	}
+
+	if failed {
+		log.Fatalf("new backup was written, but not all files could be backed up. not cleaning up old backups")
+	}
+
+	if *dryrun {
+		return
 	}
 
 	if config.FullKeep > 0 || config.IncrementalForFullKeep > 0 {
@@ -470,10 +496,11 @@ func fileChanged(old, new *file) bool {
 		old.group != new.group
 }
 
-func storeFile(path string, size int64, data io.Writer) (err error) {
+func storeFile(path string, size int64, data io.Writer) (written int64, fatal bool, err error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return err
+		nonfatal := os.IsNotExist(err) || os.IsPermission(err)
+		return 0, !nonfatal, err
 	}
 	defer func() {
 		err2 := f.Close()
@@ -483,10 +510,13 @@ func storeFile(path string, size int64, data io.Writer) (err error) {
 	}()
 	n, err := io.Copy(data, f)
 	if err != nil {
-		return err
+		return 0, true, err
 	}
-	if n != size {
-		return fmt.Errorf("expected to write %d bytes, only wrote %d", size, n)
+	if n < size {
+		return 0, true, fmt.Errorf("expected to write %d bytes, only wrote %d", size, n)
 	}
-	return
+	if n > size {
+		log.Printf("storing %q: file changed while storing, expected to write %d bytes, wrote %d", path, size, n)
+	}
+	return n, false, nil
 }

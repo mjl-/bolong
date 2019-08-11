@@ -14,7 +14,7 @@ func (s *fakeWriteStore) List() (names []string, err error) {
 	return nil, errRead
 }
 
-func (s *nullStore) Open(path string) (r io.ReadCloser, err error) {
+func (s *fakeWriteStore) Open(path string) (r io.ReadCloser, err error) {
 	return nil, errRead
 }
 
@@ -32,16 +32,16 @@ func (f *fakeWriteCloser) Close() error {
 }
 
 // Create returns a fake WriteCloser that allows all writes and close without saving anything.
-func (s *nullStore) Create(path string) (w io.WriteCloser, err error) {
+func (s *fakeWriteStore) Create(path string) (w io.WriteCloser, err error) {
 	return &fakeWriteCloser{}, nil
 }
 
 // Rename fakes a successful rename.
-func (s *nullStore) Rename(opath, npath string) (err error) {
+func (s *fakeWriteStore) Rename(opath, npath string) (err error) {
 	return nil
 }
 
 // Rename fakes a successful delete.
-func (s *nullStore) Delete(path string) (err error) {
+func (s *fakeWriteStore) Delete(path string) (err error) {
 	return nil
 }
