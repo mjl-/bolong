@@ -21,6 +21,7 @@ func backupCmd(args []string, name string) {
 		fs.PrintDefaults()
 	}
 	verbose := fs.Bool("verbose", false, "print files being backed up")
+	dryrun := fs.Bool("dryrun", false, "do not actually write backup, can be used with -verbose to see which files would have been written")
 	fs.Parse(args)
 	args = fs.Args()
 
@@ -100,6 +101,13 @@ func backupCmd(args []string, name string) {
 		} else {
 			log.Fatalln("listing backups for determing full or incremental backup:", err)
 		}
+	}
+
+	// For dry run mode, we simply switch to a "store" that doesn't actually write
+	// anything. We just read the previous index file above (if needed), and we don't
+	// need to read any more from the store.
+	if *dryrun {
+		store = &fakeWriteStore{}
 	}
 
 	// keep track of the paths we've created at remote, so we can clean up them up when we are interrupted.
