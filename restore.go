@@ -19,7 +19,7 @@ import (
 type restore struct {
 	previousIndex int
 	previous      previous
-	files         []*file // no directories
+	files         []*file // No directories.
 }
 
 func restoreCmd(args []string) {
@@ -221,7 +221,7 @@ func restoreCmd(args []string) {
 
 	restorePrevious := func(rest *restore) {
 		lcheck, handle := errorHandler(func(err error) {
-			// print additional newline, or we would print text behind progress text
+			// Print additional newline, or we would print text behind progress text.
 			log.Fatalln("\nrestore:", err)
 		})
 		defer handle()
@@ -290,7 +290,7 @@ func restoreCmd(args []string) {
 		}
 	}
 
-	// restore all directories first. ensures creating files always works.
+	// Restore all directories first. ensures creating files always works.
 	for _, f := range dirs {
 		if _, ok := needDirs[f.name]; ok && f.name != "." {
 			err = os.Mkdir(target+f.name, f.permissions)
@@ -298,9 +298,9 @@ func restoreCmd(args []string) {
 		}
 	}
 
-	// start restoring.
-	// we restore 3 data files at a time, for higher throughput.
-	// we start the first & last data files first. those are most likely to be big and dominate the time it takes to restore.
+	// Start restoring.
+	// We restore 3 data files at a time, for higher throughput.
+	// We start the first & last data files first. Those are most likely to be big and dominate the time it takes to restore.
 	workc := make(chan *restore, len(restores))
 	donec := make(chan struct{}, 1)
 	worker := func() {
@@ -325,7 +325,7 @@ func restoreCmd(args []string) {
 	var (
 		dataTransferred = int64(0)
 		ntick           = 0
-		progress        [5]int64 // circle history of dataTransferred
+		progress        [5]int64 // Circle history of dataTransferred.
 		unitSize        float64
 		unit            string
 		prevLine        = ""
@@ -383,7 +383,7 @@ func restoreCmd(args []string) {
 			case n := <-transferred:
 				dataTransferred += int64(n)
 			case <-tick:
-				// for verbose, the files are printed and interfere with the files
+				// For verbose, the files are printed and interfere with the files.
 				if *quiet || *verbose {
 					continue
 				}
@@ -398,7 +398,7 @@ func restoreCmd(args []string) {
 		fmt.Println("")
 	}
 
-	// restore owner and mtimes for directories
+	// Restore owner and mtimes for directories.
 	for _, f := range dirs {
 		if _, ok := needDirs[f.name]; ok {
 			tpath := target + f.name

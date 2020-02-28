@@ -100,7 +100,7 @@ func main() {
 		log.Printf("config OK")
 	case "backup":
 		parseConfig()
-		// create name from timestamp now, for simpler testcode
+		// Create name from timestamp now, for simpler testcode.
 		name := time.Now().UTC().Format("20060102-150405")
 		backupCmd(args, name)
 	case "restore":

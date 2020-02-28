@@ -22,7 +22,7 @@ func (b backup) GoString() string {
 	return fmt.Sprintf("backup{name: %s, incremental: %v}", b.name, b.incremental)
 }
 
-// return backups in order of timestamp
+// ListBackups returns all known backups, ordered by name/timestamp.
 func listBackups() ([]*backup, error) {
 	var r []*backup
 	l, err := store.List()
@@ -69,7 +69,7 @@ func findBackup(name string) (*backup, error) {
 	return nil, fmt.Errorf("not found")
 }
 
-// find the backup, and its predecessors, up until the first full backup
+// FindBackupChain finds the backup, and its predecessors, up until the first full backup.
 func findBackupChain(name string) ([]*backup, error) {
 	l, err := listBackups()
 	if err != nil {

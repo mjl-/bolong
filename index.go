@@ -54,7 +54,7 @@ type file struct {
 type previous struct {
 	incremental bool
 	name        string
-	dataSize    int64 // size of data file, after compression and encryption
+	dataSize    int64 // Size of data file, after compression and encryption.
 }
 
 func (p previous) indexString() string {

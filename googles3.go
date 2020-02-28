@@ -14,8 +14,8 @@ import (
 )
 
 type googleS3 struct {
-	bucket string // no slashes
-	path   string // starts and ends with slash
+	bucket string // No slashes.
+	path   string // Starts and ends with slash
 }
 
 var _ destination = &googleS3{}
@@ -71,7 +71,7 @@ func (r *googleS3) List() (names []string, err error) {
 	for i, name := range list.Key {
 		list.Key[i] = name[prefix:]
 	}
-	// names should already be sorted, but let's be sure...
+	// Names should already be sorted, but let's be sure...
 	sort.Slice(list.Key, func(i, j int) bool {
 		return list.Key[i] < list.Key[j]
 	})
@@ -109,7 +109,7 @@ func (r *googleS3) Open(path string) (rc io.ReadCloser, err error) {
 
 type s3writer struct {
 	p   *io.PipeWriter
-	err chan error // for waiting until request has completed
+	err chan error // For waiting until request has completed.
 }
 
 func (x *s3writer) Write(buf []byte) (int, error) {

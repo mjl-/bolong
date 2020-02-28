@@ -27,8 +27,8 @@ type testTree struct {
 }
 
 func TestMain(t *testing.T) {
-	// create config file, make a few backups, some full, some incremental.  with changed files.
-	// test that all files are properly restored, that old incrementals are removed. the inclusion/exclusion.
+	// Create config file, make a few backups, some full, some incremental.  with changed files.
+	// Test that all files are properly restored, that old incrementals are removed. the inclusion/exclusion.
 
 	test := func(err error, msg string) {
 		t.Helper()
@@ -104,7 +104,7 @@ func TestMain(t *testing.T) {
 				td := testDir{path: f.name}
 				tt.dirs = append(tt.dirs, td)
 			} else {
-				tf := testFile{path: f.name, contents: ""} // no contents yet
+				tf := testFile{path: f.name, contents: ""} // No contents yet.
 				tt.files = append(tt.files, tf)
 			}
 		}
@@ -212,7 +212,7 @@ func TestMain(t *testing.T) {
 		config = configuration{}
 	}()
 
-	// start with simple test
+	// Start with simple test.
 	list([]string{})
 	l, err := listBackups()
 	test(err, "listing backups")
@@ -220,8 +220,8 @@ func TestMain(t *testing.T) {
 		t.Error("expected zero backups, found at least one")
 	}
 
-	// create new backup
-	// check that it is a full, and that all the right files are included/excluded.  just parse the index and see if it is all correct.
+	// Create new backup.
+	// Check that it is a full, and that all the right files are included/excluded.  Just parse the index and see if it is all correct.
 	tree1 := testTree{
 		files: []testFile{
 			{"a/a/excluded.txt", "not in backup"},
@@ -240,16 +240,16 @@ func TestMain(t *testing.T) {
 		},
 	}
 	expTree1 := treeInExclude(tree1)
-	// add/remove some files/dirs, and change contents
+	// Add/remove some files/dirs, and change contents.
 	tree2 := testTree{
 		files: []testFile{
 			{"a/a/excluded.txt", "not in backup"},
 			{"a/a/not-included.ext", "not in backup"},
 			{"a/a/test.txt", "more"},
-			// a/b/t1.txt removed, in the middle of tree1's data file
-			{"a/b/t2.txt", "different content"}, // updated contents
-			{"a/b/t3.txt", "test3"},             // new file
-			{"a/b/t4.txt", "test4"},             // new file
+			// a/b/t1.txt removed, in the middle of tree1's data file.
+			{"a/b/t2.txt", "different content"}, // Updated contents.
+			{"a/b/t3.txt", "test3"},             // New file.
+			{"a/b/t4.txt", "test4"},             // New file
 			{"a/b/whitelisted", "included because of a/b/"},
 		},
 		dirs: []testDir{
@@ -263,7 +263,7 @@ func TestMain(t *testing.T) {
 	}
 	expTree2 := treeInExclude(tree2)
 
-	// change all the files from tree2, so it is no longer needed when restoring
+	// Change all the files from tree2, so it is no longer needed when restoring.
 	tree3 := testTree{
 		files: []testFile{
 			{"a/a/excluded.txt", "not in backup"},
@@ -296,8 +296,8 @@ func TestMain(t *testing.T) {
 	ntree := indexTree("latest")
 	compareTree(expTree1, ntree, false)
 
-	// do a restore
-	// check that it restored all files correctly
+	// Do a restore.
+	// Check that it restored all files correctly.
 	resetRestoreDir()
 	restoreCmd([]string{"-quiet", "testdir/restore"})
 	compareTree(expTree1, fsTree("testdir/restore/"), true)
@@ -314,13 +314,13 @@ func TestMain(t *testing.T) {
 	restoreCmd([]string{"-quiet", "testdir/restore"})
 	compareTree(expTree3, fsTree("testdir/restore/"), true)
 
-	// so far we have 1 fulll, 2 incrementals
+	// So far we have 1 fulll, 2 incrementals.
 	backupCmd([]string{"testdir/workdir"}, "20171222-0004") // full
 	backupCmd([]string{"testdir/workdir"}, "20171222-0005") // incr
 	backupCmd([]string{"testdir/workdir"}, "20171222-0006") // incr
 	backupCmd([]string{"testdir/workdir"}, "20171222-0007") // full
 	backupCmd([]string{"testdir/workdir"}, "20171222-0008") // incr
-	// we should now have 2 full, 1 incr
+	// We should now have 2 full, 1 incr.
 	l, err = listBackups()
 	test(err, "listing backups")
 	if len(l) != 3 {

@@ -65,8 +65,8 @@ func backupCmd(args []string, name string) {
 		dir += "/"
 	}
 
-	// incremental backups list the previous incr/full backups that need files from
-	// so we have to do some bookkeeping when we do an incremental backup, only keeping index files of previous backups that still have a file we need.
+	// Incremental backups list the previous incr/full backups they need files from.
+	// So we have to do some bookkeeping when we do an incremental backup, only keeping index files of previous backups that still have a file we need.
 	type earlier struct {
 		prev previous
 		used bool
@@ -78,7 +78,7 @@ func backupCmd(args []string, name string) {
 	unseen := map[string]*file{}
 	incremental := false
 	if config.IncrementalsPerFull > 0 {
-		// backups will be all incremental backups (most recent first), leading to the first full backup (also included)
+		// Backups will be all incremental backups (most recent first), leading to the first full backup (also included).
 		backups, err := findBackupChain("latest")
 		if err == nil {
 			incremental = len(backups)-1 < config.IncrementalsPerFull
@@ -97,7 +97,7 @@ func backupCmd(args []string, name string) {
 				earliers[len(earliers)-1] = earlier{previous{true, b.name, oidx.dataSize}, false}
 			}
 		} else if err == errNotFound {
-			// do first full
+			// Do first full.
 		} else {
 			log.Fatalln("listing backups for determing full or incremental backup:", err)
 		}
@@ -110,7 +110,7 @@ func backupCmd(args []string, name string) {
 		store = &fakeWriteStore{}
 	}
 
-	// keep track of the paths we've created at remote, so we can clean up them up when we are interrupted.
+	// Keep track of the paths we've created at remote, so we can clean up them up when we are interrupted.
 	partialpaths := make(chan string)
 	cleanup := make(chan os.Signal)
 	signal.Notify(cleanup, syscall.SIGINT, syscall.SIGTERM)
@@ -162,7 +162,7 @@ func backupCmd(args []string, name string) {
 		check(err, "creating safe file")
 	}
 
-	var whitelist []string // whitelisted directories. all children files will be included.
+	var whitelist []string // Whitelisted directories. All children files will be included.
 
 	skip := func(matchPath string, matchInfo os.FileInfo, verbose bool) bool {
 		if len(includes) > 0 {
@@ -276,11 +276,11 @@ func backupCmd(args []string, name string) {
 				if !fileChanged(of, nf) {
 					if !nf.isDir {
 						nf.dataOffset = of.dataOffset
-						// these indices are against the index file from the previous incremental backup.
-						// we fix up these indices later on, after we know which previous backups are still referenced.
+						// These indices are against the index file from the previous incremental backup.
+						// We fix up these indices later on, after we know which previous backups are still referenced.
 						prevIndex := of.previousIndex
 						if prevIndex == -1 {
-							// files contained in the last index are now in the new previous-index-reference
+							// Files contained in the last index are now in the new previous-index-reference
 							prevIndex = len(earliers) - 1
 						}
 						nf.previousIndex = prevIndex
@@ -334,8 +334,8 @@ func backupCmd(args []string, name string) {
 	})
 
 	if incremental {
-		// map previousIndex from last index file to those in index file we're making now.
-		// some old index/data files might may no longer be necessary, because all files contained within have been overwritten/deleted.
+		// Map previousIndex from last index file to those in index file we're making now.
+		// Some old index/data files might may no longer be necessary, because all files contained within have been overwritten/deleted.
 		prevIndexMap := map[int]int{}
 		for i, e := range earliers {
 			if e.used {
@@ -351,7 +351,7 @@ func backupCmd(args []string, name string) {
 		for _, f := range unseen {
 			nidx.delete = append(nidx.delete, f.name)
 		}
-		// sort for better compression rate of index
+		// Sort for better compression rate of index.
 		sort.Slice(nidx.delete, func(i, j int) bool {
 			return nidx.delete[i] < nidx.delete[j]
 		})
@@ -401,6 +401,7 @@ func backupCmd(args []string, name string) {
 	}
 
 	if *dryrun {
+		log.Printf("note: dryrun, nothing was actually written")
 		return
 	}
 
@@ -408,7 +409,7 @@ func backupCmd(args []string, name string) {
 		backups, err := listBackups()
 		check(err, "listing backups for cleaning up old backups")
 
-		// cleanup full backups, and everything before that
+		// Cleanup full backups, and everything before that.
 		fullSeen := 0
 		for i := len(backups) - 1; i > 0 && config.FullKeep > 0; i-- {
 			if backups[i].incremental {
@@ -418,7 +419,7 @@ func backupCmd(args []string, name string) {
 			if fullSeen < config.FullKeep {
 				continue
 			}
-			// remove everything (both incr and full) before this latest full
+			// Remove everything (both incr and full) before this latest full.
 			for j := 0; j < i; j++ {
 				ext := "full"
 				kind := "full"
@@ -438,7 +439,7 @@ func backupCmd(args []string, name string) {
 					log.Println("removing old backup:", err)
 				}
 			}
-			// we'll continue with removing incrementals on the remaining backups, those we kept
+			// We'll continue with removing incrementals on the remaining backups, those we kept.
 			backups = backups[i:]
 			break
 		}
@@ -452,7 +453,7 @@ func backupCmd(args []string, name string) {
 			if fullSeen < config.IncrementalForFullKeep {
 				continue
 			}
-			// remove all incrementals before this latest full backup we've just seen
+			// Remove all incrementals before this latest full backup we've just seen.
 			for j := 0; j < i; j++ {
 				if !backups[j].incremental {
 					continue
