@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"path/filepath"
+	"sort"
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
@@ -25,6 +26,9 @@ func (s *sftpStore) List() (names []string, err error) {
 	for i, fi := range l {
 		names[i] = fi.Name()
 	}
+	sort.Slice(names, func(i, j int) bool {
+		return names[i] < names[j]
+	})
 	return names, nil
 }
 
