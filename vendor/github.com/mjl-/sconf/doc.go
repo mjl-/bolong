@@ -58,7 +58,8 @@ The top-level is always a map. Maps start with a key, followed by a colon,
 followed by a value. Basic values like strings, ints, bools run to the end of
 the line. The leading space after a colon or dash is removed. Other values like
 maps and lists start on a new line, with an additional level of indenting. List
-values start with a dash.
+values start with a dash. Empty lines are allowed. Multiline strings are not
+possible. Strings do not have escaped characters.
 
 And the struct that generated this:
 

@@ -230,3 +230,7 @@ func (r *googleS3) Delete(path string) (err error) {
 	}
 	return err
 }
+
+func (r *googleS3) Close() error {
+	return nil
+}

@@ -207,6 +207,10 @@ func TestMain(t *testing.T) {
 
 	*configPath = "testdir/workdir/.bolong.conf"
 	parseConfig()
+	defer func() {
+		configPath = nil
+		config = configuration{}
+	}()
 
 	// start with simple test
 	list([]string{})

@@ -5,21 +5,21 @@ Bolong is a simple, secure and fast command-line backup and restore tool.
 Features:
 
 - Full and incremental backups. You can configure how many incremental backups
-are made before a full backup is created. Incremental backups only store files
-that have different size/mtime/permissions compared to the previous backup.
-Bolong does not compare file contents.
+  are made before a full backup is created. Incremental backups only store files
+  that have different size/mtime/permissions compared to the previous backup.
+  Bolong does not compare file contents.
 - Stores data either in the "local" file system (which can be a mounted network
-disk) or in Google's S3 storage clone (not AWS, only Google does reasonable
-streaming uploads).
+  disk), "sftp" or "googles3" for Google's S3 storage clone (not AWS, only Google
+  does reasonable streaming uploads).
 - Compression with lz4. Compression rate is not too great, but it's very fast
-and won't slow restores down.
+  and won't slow restores down.
 - Encrypted and authenticated data. A cloud storage provider cannot read your
-data, and cannot tamper with it.
+  data, and cannot tamper with it.
 
 Non-features:
 
 - Deduplication. It would be a nice feature, but too much code/complexity for
-our purposes. Simple backups are more likely to be reliable backups.
+  our purposes. Simple backups are more likely to be reliable backups.
 
 
 ## Examples
@@ -103,5 +103,6 @@ For feedback, contact Mechiel Lukkien at mechiel@ueber.net.
 
 - progress bar doesn't work as expected. we show bytes transfered of total bytes in file. but we quit earlier for partial restores. should indicate we aren't going to download the full block.
 - should check created (remote) file exists just after uploading.
+- add a mode where we encrypt using only a public key crypto in the config, with restores requiring the private key. we would need to keep track of more information locally (an index file) to make incremental backups.
 - is our behaviour desirable when restoring to a directory that already has some files?  we currently fail when we try to create a file/directory that already exists.
 - look into using google sdk for cloud storage.

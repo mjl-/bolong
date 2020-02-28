@@ -40,3 +40,7 @@ func (l *local) Rename(opath, npath string) (err error) {
 func (l *local) Delete(path string) (err error) {
 	return os.Remove(l.path + path)
 }
+
+func (l *local) Close() error {
+	return nil
+}

@@ -13,4 +13,7 @@ type destination interface {
 	Create(path string) (w io.WriteCloser, err error)
 	Rename(opath, npath string) (err error)
 	Delete(path string) (err error)
+
+	// Close cleans up, shutting down any connections created.
+	Close() error
 }

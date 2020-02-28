@@ -11,6 +11,12 @@ tests:
 	go tool cover -html=cover.out -o cover.html
 	golint
 
+# for sftp, you'll need a file local/bolong-sftp.conf with credentials
+tests-sftp:
+	go test -coverprofile=cover.out -tags=sftp
+	go tool cover -html=cover.out -o cover.html
+	golint
+
 release:
 	env GOOS=linux GOARCH=amd64 ./release.sh
 	env GOOS=linux GOARCH=386 ./release.sh

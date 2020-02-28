@@ -1,15 +1,19 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"path"
 	"strings"
 	"time"
 
 	"github.com/mjl-/sconf"
+	"github.com/pkg/sftp"
+	"golang.org/x/crypto/ssh"
 )
 
 var (
@@ -30,6 +34,14 @@ type configuration struct {
 		Bucket    string `sconf-doc:"Name of bucket to store backups in."`
 		Path      string `sconf-doc:"Path in bucket to store backups in, must start ane end with a slash."`
 	} `sconf:"optional" sconf-doc:"Store backups on the S3-compatible Google Cloud Storage."`
+	Sftp *struct {
+		Address        string   `sconf-doc:"Address of ssh server."`
+		Path           string   `sconf-doc:"Path on sftp server to read/write files. Can be relative (to home directory) or absolute."`
+		HostPublicKeys []string `sconf-doc:"Public keys of server, each in single-line known hosts format. E.g. [host]:22 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEAk5ddq3uFeN6pQ38xxzOhftxDu+Xp39ULmMiSdxoFo"`
+		User           string   `sconf-doc:"Username to login as."`
+		Password       string   `sconf:"optional" sconf-doc:"Password to login with. Either Password or PrivateKey must be non-empty."`
+		PrivateKey     []string `sconf:"optional" sconf-doc:"Private key to login with, each line as string, typically starting with \"-----BEGIN OPENSSH PRIVATE KEY-----\". Either Password or PrivateKey must be non-empty."`
+	} `sconf:"optional" sconf-doc:"Store backups on sftp server."`
 	Include                []string `sconf:"optional" sconf-doc:"If set, whitelist of files to store when making a backup, non-matching files/directories are not backed up. Files are regular expressions. When matching, directories end with a slash, except the root directory which is represented as emtpy string. If an included file also matches an exclude rule, it is not included."`
 	Exclude                []string `sconf:"optional" sconf-doc:"If set, blacklist of files not to store when making a backup. Even if the file is in the whitelist."`
 	IncrementalsPerFull    int      `sconf:"optional" sconf-doc:"Number of incremental backups before making another full backup. For a weekly full backup, set this to 6."`
@@ -111,7 +123,14 @@ func main() {
 		fmt.Println(version)
 	default:
 		flag.Usage()
-		os.Exit(1)
+		os.Exit(2)
+	}
+
+	if store != nil {
+		err := store.Close()
+		if err != nil {
+			log.Fatalf("closing destination store: %v", err)
+		}
 	}
 }
 
@@ -122,11 +141,18 @@ func parseConfig() {
 	err := sconf.ParseFile(*configPath, &config)
 	check(err, "reading config")
 
-	if config.Local == nil && config.GoogleS3 == nil {
-		log.Fatal("must have either Local or GoogleS3 configured")
+	configs := []string{}
+	if config.Local != nil {
+		configs = append(configs, "Local")
 	}
-	if config.Local != nil && config.GoogleS3 != nil {
-		log.Fatal("cannot have both Local and GoogleS3 configured")
+	if config.GoogleS3 != nil {
+		configs = append(configs, "GoogleS3")
+	}
+	if config.Sftp != nil {
+		configs = append(configs, "Sftp")
+	}
+	if len(configs) != 1 {
+		log.Fatalf("must have exactly one of Local, GoogleS3 or Sftp configured, saw %v", configs)
 	}
 
 	switch {
@@ -148,6 +174,73 @@ func parseConfig() {
 			log.Fatal(`field "GoogleS3.Path" must start and end with a slash`)
 		}
 		store = &googleS3{config.GoogleS3.Bucket, path}
+	case config.Sftp != nil:
+		if *remotePath != "" {
+			config.Sftp.Path = *remotePath
+		}
+		path := config.Sftp.Path
+		if path != "" && !strings.HasSuffix(path, "/") {
+			path += "/"
+		}
+
+		hostPublicKeys := []ssh.PublicKey{}
+		for _, ks := range config.Sftp.HostPublicKeys {
+			marker, _, hostPubKey, _, _, err := ssh.ParseKnownHosts([]byte(ks))
+			check(err, "parsing sftp host public key in known host format: "+ks)
+			if marker != "" {
+				log.Fatalf("marker must be empty string, saw %q", marker)
+			}
+			hostPublicKeys = append(hostPublicKeys, hostPubKey)
+		}
+		if len(hostPublicKeys) == 0 {
+			log.Fatalf("need at least one host public key, try using ssh-keyscan to gather them")
+		}
+
+		auths := 0
+		var auth []ssh.AuthMethod
+		if len(config.Sftp.PrivateKey) != 0 {
+			auths++
+			pk := ""
+			for _, line := range config.Sftp.PrivateKey {
+				pk += line + "\n"
+			}
+			signer, err := ssh.ParsePrivateKey([]byte(pk))
+			check(err, "parsing ssh private key")
+			auth = append(auth, ssh.PublicKeys(signer))
+		}
+		if config.Sftp.Password != "" {
+			auths++
+			auth = append(auth, ssh.Password(config.Sftp.Password))
+		}
+		if auths == 0 {
+			log.Fatalf("must set at least one of Password and PrivateKey for Sftp")
+		}
+
+		sshConfig := &ssh.ClientConfig{
+			HostKeyCallback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+				b := key.Marshal()
+				for _, hk := range hostPublicKeys {
+					if bytes.Equal(b, hk.Marshal()) {
+						return nil
+					}
+				}
+				return fmt.Errorf("host key mismatch")
+			},
+			User: config.Sftp.User,
+			Auth: auth,
+		}
+
+		sshc, err := ssh.Dial("tcp", config.Sftp.Address, sshConfig)
+		check(err, "new ssh connection")
+
+		sftpc, err := sftp.NewClient(sshc)
+		check(err, "new sftp connection")
+
+		store = &sftpStore{
+			sshClient:  sshc,
+			sftpClient: sftpc,
+			remotePath: path,
+		}
 	}
 	if config.Passphrase == "" {
 		log.Fatalln("passphrase cannot be empty")
