@@ -3,8 +3,8 @@
 # github.com/kr/fs v0.1.0
 ## explicit
 github.com/kr/fs
-# github.com/minio/sio v0.0.0-20170919020100-ac72eebc12cd
-## explicit
+# github.com/minio/sio v0.3.0
+## explicit; go 1.13
 github.com/minio/sio
 # github.com/mjl-/sconf v0.0.1
 ## explicit; go 1.12
