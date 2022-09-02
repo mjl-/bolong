@@ -112,7 +112,7 @@ func backupCmd(args []string, name string) {
 
 	// Keep track of the paths we've created at remote, so we can clean up them up when we are interrupted.
 	partialpaths := make(chan string)
-	cleanup := make(chan os.Signal)
+	cleanup := make(chan os.Signal, 1)
 	signal.Notify(cleanup, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		var paths []string
