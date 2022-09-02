@@ -1,16 +1,18 @@
+# github.com/frankban/quicktest v1.14.3
+## explicit; go 1.13
 # github.com/kr/fs v0.1.0
 ## explicit
 github.com/kr/fs
 # github.com/minio/sio v0.0.0-20170919020100-ac72eebc12cd
 ## explicit
 github.com/minio/sio
-# github.com/mjl-/sconf v0.0.0-20190603191030-08de39cd8a7d
+# github.com/mjl-/sconf v0.0.1
 ## explicit; go 1.12
 github.com/mjl-/sconf
 # github.com/mjl-/xfmt v0.0.0-20190603190332-c0414928dc1f
 ## explicit; go 1.12
 github.com/mjl-/xfmt
-# github.com/pierrec/lz4 v2.0.5+incompatible
+# github.com/pierrec/lz4 v2.6.1+incompatible
 ## explicit
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
