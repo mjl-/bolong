@@ -14,25 +14,23 @@ github.com/mjl-/xfmt
 ## explicit
 github.com/pierrec/lz4
 github.com/pierrec/lz4/internal/xxh32
-# github.com/pkg/errors v0.9.1
-## explicit
-github.com/pkg/errors
-# github.com/pkg/sftp v1.11.0
-## explicit; go 1.12
+# github.com/pkg/sftp v1.13.5
+## explicit; go 1.15
 github.com/pkg/sftp
-# golang.org/x/crypto v0.0.0-20200221231518-2aa609cf4a9d
-## explicit; go 1.11
+github.com/pkg/sftp/internal/encoding/ssh/filexfer
+# golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
+## explicit; go 1.17
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/chacha20
 golang.org/x/crypto/chacha20poly1305
 golang.org/x/crypto/curve25519
+golang.org/x/crypto/curve25519/internal/field
 golang.org/x/crypto/ed25519
-golang.org/x/crypto/ed25519/internal/edwards25519
-golang.org/x/crypto/internal/subtle
+golang.org/x/crypto/internal/alias
+golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/pbkdf2
-golang.org/x/crypto/poly1305
 golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
-# golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae
-## explicit; go 1.12
+# golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
+## explicit; go 1.17
 golang.org/x/sys/cpu
