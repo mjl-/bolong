@@ -1,3 +1,4 @@
+//go:build sftp
 // +build sftp
 
 package main
