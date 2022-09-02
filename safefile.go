@@ -80,17 +80,13 @@ func (sf *safeWriter) Write(buf []byte) (n int, err error) {
 	return sf.writer.Write(buf)
 }
 
-func (sf *safeWriter) Close() error {
+func (sf *safeWriter) Close() (rerr error) {
 	err := sf.writer.Flush()
 	err2 := sf.lz.Close()
 	if err == nil {
 		err = err2
 	}
 	err2 = sf.crypt.Close()
-	if err == nil {
-		err = err2
-	}
-	err2 = sf.orig.Close()
 	if err == nil {
 		err = err2
 	}
