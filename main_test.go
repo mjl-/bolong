@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -177,7 +176,7 @@ func TestMain(t *testing.T) {
 			if info.IsDir() {
 				tree.dirs = append(tree.dirs, testDir{path: relpath})
 			} else {
-				buf, err := ioutil.ReadFile(dir + relpath)
+				buf, err := os.ReadFile(dir + relpath)
 				test(err, "read fs file")
 				tree.files = append(tree.files, testFile{path: relpath, contents: string(buf)})
 			}

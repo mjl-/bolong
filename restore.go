@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/user"
@@ -250,13 +249,13 @@ func restoreCmd(args []string) {
 			tpath := target + file.name
 
 			if file.dataOffset > offset {
-				_, err := io.Copy(ioutil.Discard, &io.LimitedReader{R: data, N: file.dataOffset - offset})
+				_, err := io.Copy(io.Discard, &io.LimitedReader{R: data, N: file.dataOffset - offset})
 				lcheck(err, "skipping through data")
 				offset = file.dataOffset
 			}
 
 			if file.isSymlink {
-				buf, err := ioutil.ReadAll(&io.LimitedReader{R: data, N: file.size})
+				buf, err := io.ReadAll(&io.LimitedReader{R: data, N: file.size})
 				lcheck(err, "reading symlink path")
 				n := int64(len(buf))
 				if n != file.size {

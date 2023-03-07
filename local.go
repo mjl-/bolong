@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -14,7 +13,7 @@ var _ destination = &local{}
 
 // List returns filenames sorted by name.
 func (l *local) List() (names []string, err error) {
-	files, err := ioutil.ReadDir(l.path)
+	files, err := os.ReadDir(l.path)
 	if err != nil {
 		return nil, err
 	}
