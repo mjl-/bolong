@@ -225,6 +225,7 @@ func backupCmd(args []string, name string) {
 			if os.IsNotExist(err) || os.IsPermission(err) {
 				log.Printf("error walking %s: %s, continuing with error", path, err)
 				failed = true
+				return nil
 			} else {
 				log.Fatalf("error walking %s: %s", path, err)
 			}
