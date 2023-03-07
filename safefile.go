@@ -8,7 +8,7 @@ import (
 	"io"
 
 	"github.com/minio/sio"
-	"github.com/pierrec/lz4"
+	"github.com/pierrec/lz4/v4"
 	"golang.org/x/crypto/pbkdf2"
 )
 
