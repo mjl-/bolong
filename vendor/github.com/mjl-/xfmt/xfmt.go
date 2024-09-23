@@ -112,6 +112,7 @@ func (f *formatter) gatherLine() (string, string) {
 	var curLine, curLineend string
 	var curPrefix string
 
+	n := 0
 	for {
 		line, end := f.peekLine()
 		if line == "" && end == "" {
@@ -127,7 +128,7 @@ func (f *formatter) gatherLine() (string, string) {
 			}
 			break
 		}
-		if curLine != "" && (curPrefix != prefix || rem == "" || f.causeBreak(rem)) {
+		if n > 0 && (curPrefix != prefix || rem == "" || f.causeBreak(rem)) {
 			break
 		}
 		curPrefix = prefix
@@ -140,6 +141,7 @@ func (f *formatter) gatherLine() (string, string) {
 		if curLine != "" && curLine[len(curLine)-1] < 0x20 {
 			break
 		}
+		n++
 	}
 
 	return curPrefix + curLine, curLineend
