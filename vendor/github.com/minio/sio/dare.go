@@ -31,7 +31,7 @@ func (h headerV10) SetVersion()                  { h[0] = Version10 }
 func (h headerV10) SetCipher(suite byte)         { h[1] = suite }
 func (h headerV10) SetLen(length int)            { binary.LittleEndian.PutUint16(h[2:], uint16(length-1)) }
 func (h headerV10) SetSequenceNumber(num uint32) { binary.LittleEndian.PutUint32(h[4:], num) }
-func (h headerV10) SetRand(randVal []byte)       { copy(h[8:headerSize], randVal[:]) }
+func (h headerV10) SetRand(randVal []byte)       { copy(h[8:headerSize], randVal) }
 func (h headerV10) Nonce() []byte                { return h[4:headerSize] }
 func (h headerV10) AddData() []byte              { return h[:4] }
 
@@ -90,7 +90,9 @@ func newAuthEncV10(cfg *Config) (authEncV10, error) {
 		return authEncV10{}, err
 	}
 	var randVal [8]byte
-	if _, err = io.ReadFull(cfg.Rand, randVal[:]); err != nil {
+	if cfg.Nonce != nil {
+		copy(randVal[:], cfg.Nonce[:8])
+	} else if _, err = io.ReadFull(cfg.Rand, randVal[:]); err != nil {
 		return authEncV10{}, err
 	}
 	return authEncV10{
@@ -167,7 +169,9 @@ func newAuthEncV20(cfg *Config) (authEncV20, error) {
 		return authEncV20{}, err
 	}
 	var randVal [12]byte
-	if _, err = io.ReadFull(cfg.Rand, randVal[:]); err != nil {
+	if cfg.Nonce != nil {
+		randVal = *cfg.Nonce
+	} else if _, err = io.ReadFull(cfg.Rand, randVal[:]); err != nil {
 		return authEncV20{}, err
 	}
 	return authEncV20{
@@ -256,7 +260,7 @@ func (ad *authDecV20) Open(dst, src []byte) error {
 		ad.finalized = true
 		refNonce[0] |= 0x80 // set final flag
 	}
-	if subtle.ConstantTimeCompare(header.Nonce(), refNonce[:]) != 1 {
+	if subtle.ConstantTimeCompare(header.Nonce(), refNonce) != 1 {
 		return errNonceMismatch
 	}
 

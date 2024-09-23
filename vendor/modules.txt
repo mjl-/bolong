@@ -1,7 +1,7 @@
 # github.com/kr/fs v0.1.0
 ## explicit
 github.com/kr/fs
-# github.com/minio/sio v0.3.1
+# github.com/minio/sio v0.4.1
 ## explicit; go 1.18
 github.com/minio/sio
 # github.com/mjl-/sconf v0.0.7

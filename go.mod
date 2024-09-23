@@ -3,7 +3,7 @@ module github.com/mjl-/bolong
 go 1.19
 
 require (
-	github.com/minio/sio v0.3.1
+	github.com/minio/sio v0.4.1
 	github.com/mjl-/sconf v0.0.7
 	github.com/pierrec/lz4/v4 v4.1.17
 	github.com/pkg/sftp v1.13.6
