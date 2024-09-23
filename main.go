@@ -27,7 +27,7 @@ var (
 type configuration struct {
 	Local *struct {
 		Path string `sconf-doc:"Path on local file system to store backups at."`
-	} `sconf:"optional" sconf-doc:"Store backups in a locally mounted file system. Specify either Local or GoogleS3."`
+	} `sconf:"optional" sconf-doc:"Store backups in a locally mounted file system. Specify one of Local, GoogleS3 or Sftp."`
 	GoogleS3 *struct {
 		AccessKey string `sconf-doc:"Google \"interoperable\" account for accessing storage."`
 		Secret    string `sconf-doc:"Password for AccessKey."`
