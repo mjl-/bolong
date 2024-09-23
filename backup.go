@@ -226,9 +226,8 @@ func backupCmd(args []string, name string) {
 				log.Printf("error walking %s: %s, continuing with error", path, err)
 				failed = true
 				return nil
-			} else {
-				log.Fatalf("error walking %s: %s", path, err)
 			}
+			log.Fatalf("error walking %s: %s", path, err)
 		}
 
 		if relPath == ".bolong.conf" || strings.HasSuffix(relPath, "/.bolong.conf") {
