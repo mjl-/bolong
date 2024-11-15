@@ -42,8 +42,8 @@ type configuration struct {
 		Password       string   `sconf:"optional" sconf-doc:"Password to login with. Either Password or PrivateKey must be non-empty."`
 		PrivateKey     []string `sconf:"optional" sconf-doc:"Private key to login with, each line as string, typically starting with \"-----BEGIN OPENSSH PRIVATE KEY-----\". Either Password or PrivateKey must be non-empty."`
 	} `sconf:"optional" sconf-doc:"Store backups on sftp server."`
-	Include                []string `sconf:"optional" sconf-doc:"If set, whitelist of files to store when making a backup, non-matching files/directories are not backed up. Files are regular expressions. When matching, directories end with a slash, except the root directory which is represented as emtpy string. If an included file also matches an exclude rule, it is not included."`
-	Exclude                []string `sconf:"optional" sconf-doc:"If set, blacklist of files not to store when making a backup. Even if the file is in the whitelist."`
+	Include                []string `sconf:"optional" sconf-doc:"If set, regular expression patterns for paths to store when making a backup, non-matching files/directories are not backed up. When matching, directories end with a slash, except the root directory which is represented as emtpy string. If an included path also matches an exclude rule, it is not included."`
+	Exclude                []string `sconf:"optional" sconf-doc:"If set, regular expression patterns for paths to skip when making a backup, even if the file matches a pattern from Include."`
 	IncrementalsPerFull    int      `sconf:"optional" sconf-doc:"Number of incremental backups before making another full backup. For a weekly full backup, set this to 6."`
 	FullKeep               int      `sconf-doc:"Number of full backups to keep. After a backup, older backups are removed."`
 	IncrementalForFullKeep int      `sconf:"optional" sconf-doc:"Number of past full backups for which also incremental backups are stored."`

@@ -162,17 +162,17 @@ func backupCmd(args []string, name string) {
 		check(err, "creating safe file")
 	}
 
-	var whitelist []string // Whitelisted directories. All children files will be included.
+	var allowlist []string // Allowlisted directories. All children files will be included.
 
 	skip := func(matchPath string, matchInfo os.FileInfo, verbose bool) bool {
 		if len(includes) > 0 {
 			match := matchAny(includes, matchPath)
 			if match && matchInfo.IsDir() {
-				whitelist = append(whitelist, matchPath)
+				allowlist = append(allowlist, matchPath)
 			}
 			if !match && !matchInfo.IsDir() {
 				keep := false
-				for _, white := range whitelist {
+				for _, white := range allowlist {
 					if strings.HasPrefix(matchPath, white) {
 						keep = true
 						break

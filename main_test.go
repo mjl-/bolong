@@ -228,7 +228,7 @@ func TestMain(t *testing.T) {
 			{"a/a/test.txt", "more"},
 			{"a/b/t1.txt", "this is a test"},
 			{"a/b/t2.txt", "another test"},
-			{"a/b/whitelisted", "included because of a/b/"},
+			{"a/b/allowlisted", "included because of a/b/"},
 		},
 		dirs: []testDir{
 			{"."},
@@ -249,7 +249,7 @@ func TestMain(t *testing.T) {
 			{"a/b/t2.txt", "different content"}, // Updated contents.
 			{"a/b/t3.txt", "test3"},             // New file.
 			{"a/b/t4.txt", "test4"},             // New file
-			{"a/b/whitelisted", "included because of a/b/"},
+			{"a/b/allowlisted", "included because of a/b/"},
 		},
 		dirs: []testDir{
 			{"."},
@@ -271,7 +271,7 @@ func TestMain(t *testing.T) {
 			{"a/b/t2.txt", "new different content"},
 			{"a/b/t3.txt", "new test3"},
 			{"a/b/t4.txt", "new test4"},
-			{"a/b/whitelisted", "included because of a/b/"},
+			{"a/b/allowlisted", "included because of a/b/"},
 		},
 		dirs: []testDir{
 			{"."},
@@ -341,11 +341,11 @@ func TestMain(t *testing.T) {
 	ensureTree(tree3)
 	backupCmd([]string{"testdir/workdir"}, "20171222-009")
 	resetRestoreDir()
-	restoreCmd([]string{"-quiet", "testdir/restore", "^a/a/", "/whitelisted$"})
+	restoreCmd([]string{"-quiet", "testdir/restore", "^a/a/", "/allowlisted$"})
 	xExpTree3 := testTree{
 		files: []testFile{
 			{"a/a/test.txt", "more"},
-			{"a/b/whitelisted", "included because of a/b/"},
+			{"a/b/allowlisted", "included because of a/b/"},
 		},
 		dirs: []testDir{
 			{"."},
