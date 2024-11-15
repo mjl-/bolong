@@ -6,9 +6,12 @@ build:
 	go build
 	go vet
 
-tests:
+test:
 	go test -coverprofile=cover.out
 	go tool cover -html=cover.out -o cover.html
+
+check:
+	staticcheck
 	golint
 
 # for sftp, you'll need a file local/bolong-sftp.conf with credentials
