@@ -201,7 +201,7 @@ func backupCmd(args []string, name string) {
 	failed := false
 	dataOffset := int64(0)
 	nfiles := 0
-	filepath.Walk(dir, func(path string, walkInfo os.FileInfo, err error) error {
+	err = filepath.Walk(dir, func(path string, walkInfo os.FileInfo, err error) error {
 		if !strings.HasPrefix(path, dir) {
 			log.Printf("path not prefixed by dir? path %s, dir %s", path, dir)
 			return nil
@@ -332,6 +332,7 @@ func backupCmd(args []string, name string) {
 
 		return nil
 	})
+	check(err, "walk "+dir)
 
 	if incremental {
 		// Map previousIndex from last index file to those in index file we're making now.
