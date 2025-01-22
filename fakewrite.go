@@ -46,6 +46,10 @@ func (s *fakeWriteStore) Delete(path string) (err error) {
 	return nil
 }
 
+func (s *fakeWriteStore) Ping() error {
+	return nil
+}
+
 func (s *fakeWriteStore) Close() error {
 	return nil
 }

@@ -233,14 +233,32 @@ func parseConfig() {
 		sshc, err := ssh.Dial("tcp", config.Sftp.Address, sshConfig)
 		check(err, "new ssh connection")
 
-		sftpc, err := sftp.NewClient(sshc)
+		sftpc, err := sftp.NewClient(sshc, sftp.UseConcurrentWrites(true))
 		check(err, "new sftp connection")
 
+		done := make(chan struct{})
 		store = &sftpStore{
 			sshClient:  sshc,
 			sftpClient: sftpc,
 			remotePath: path,
+			done:       done,
 		}
+		// Keep the sftp connection alive, even if we are doing lots of local i/o and have
+		// nothing to send for a while.
+		go func() {
+			t := time.NewTicker(30 * time.Second)
+			defer t.Stop()
+			select {
+			case <-t.C:
+				err := store.Ping()
+				if err != nil {
+					log.Printf("ping remote store: %v (continuing)", err)
+				}
+			case <-done:
+				return
+			}
+		}()
+
 	}
 	if config.Passphrase == "" {
 		log.Fatalln("passphrase cannot be empty")

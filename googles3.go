@@ -231,6 +231,11 @@ func (r *googleS3) Delete(path string) (err error) {
 	return err
 }
 
+// Ping is a no-op, we don't have persistent connections.
+func (r *googleS3) Ping() error {
+	return nil
+}
+
 func (r *googleS3) Close() error {
 	return nil
 }

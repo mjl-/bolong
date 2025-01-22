@@ -13,6 +13,7 @@ type sftpStore struct {
 	sshClient  *ssh.Client
 	sftpClient *sftp.Client
 	remotePath string
+	done       chan struct{} // Closed on Close.
 }
 
 var _ destination = &sftpStore{}
@@ -48,11 +49,17 @@ func (s *sftpStore) Delete(path string) (err error) {
 	return s.sftpClient.Remove(filepath.Join(s.remotePath, path))
 }
 
+func (s *sftpStore) Ping() error {
+	_, err := s.sftpClient.Getwd()
+	return err
+}
+
 func (s *sftpStore) Close() error {
 	err := s.sftpClient.Close()
 	err2 := s.sshClient.Close()
 	if err != nil {
 		return err
 	}
+	close(s.done)
 	return err2
 }

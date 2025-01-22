@@ -40,6 +40,11 @@ func (l *local) Delete(path string) (err error) {
 	return os.Remove(l.path + path)
 }
 
+func (l *local) Ping() error {
+	_, err := os.Stat(l.path)
+	return err
+}
+
 func (l *local) Close() error {
 	return nil
 }
