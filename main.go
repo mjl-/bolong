@@ -248,14 +248,16 @@ func parseConfig() {
 		go func() {
 			t := time.NewTicker(30 * time.Second)
 			defer t.Stop()
-			select {
-			case <-t.C:
-				err := store.Ping()
-				if err != nil {
-					log.Printf("ping remote store: %v (continuing)", err)
+			for {
+				select {
+				case <-t.C:
+					err := store.Ping()
+					if err != nil {
+						log.Printf("ping remote store: %v (continuing)", err)
+					}
+				case <-done:
+					return
 				}
-			case <-done:
-				return
 			}
 		}()
 
